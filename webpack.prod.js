@@ -35,12 +35,21 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               plugins: () => [
-                require('autoprefixer') ({
+                require("autoprefixer")({
                   // 兼容到浏览器最近2个版本，浏览器占有率，兼容到ios7
                   // 该配置目前调整到package.json里面的browserslist属性中，赋值与browsers一样
                   // browsers: ['last 2 version', '>1%', 'ios 7']
                 })
               ]
+            }
+          },
+          // px2rem-loader的配置使用
+          {
+            loader: "px2rem-loader",
+            options: {
+              remUnit: 75, // 1rem=75px; 750px设计稿
+              // px->rem后的小数点位数
+              remPrecision: 8
             }
           }
         ]
@@ -56,7 +65,7 @@ module.exports = {
             }
           }
         ]
-      },
+      }
       // autoprefixer postcss-loader
       // {
       //   test: /.css$/,
