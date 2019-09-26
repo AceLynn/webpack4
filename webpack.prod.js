@@ -5,6 +5,7 @@ const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
   entry: {
@@ -26,7 +27,7 @@ module.exports = {
         test: /.css$/,
         use: [
           // 和mini插件互斥
-        //   'style-loader',
+          //   'style-loader',
           MiniCssExtractPlugin.loader,
           "css-loader",
           "sass-loader"
@@ -53,8 +54,8 @@ module.exports = {
     // css压缩插件 目前测试sass样式经过抽取插件抽离后，本身就会压缩
     // 单独css需要以下插件进行压缩。或者加入sass-loader
     new OptimizeCSSAssetsPlugin({
-        assetNameRegExp: /\.css$/g,
-        cssProcessor: require('cssnano')
+      assetNameRegExp: /\.css$/g,
+      cssProcessor: require("cssnano")
     }),
     new HtmlWebpackPlugin({
       // 一个页面对应一个hwp 有更简单的写法
@@ -93,6 +94,7 @@ module.exports = {
         minifyJS: true,
         removeComments: false
       }
-    })
+    }),
+    new CleanWebpackPlugin()
   ]
 };
