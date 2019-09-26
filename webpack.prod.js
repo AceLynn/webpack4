@@ -30,9 +30,22 @@ module.exports = {
           //   'style-loader',
           MiniCssExtractPlugin.loader,
           "css-loader",
-          "sass-loader"
+          "sass-loader",
+          {
+            loader: "postcss-loader",
+            options: {
+              plugins: () => [
+                require('autoprefixer') ({
+                  // 兼容到浏览器最近2个版本，浏览器占有率，兼容到ios7
+                  // 该配置目前调整到package.json里面的browserslist属性中，赋值与browsers一样
+                  // browsers: ['last 2 version', '>1%', 'ios 7']
+                })
+              ]
+            }
+          }
         ]
       },
+      // file-loader 加载资源
       {
         test: /.(png|jpg|gif|jpeg)$/,
         use: [
@@ -43,7 +56,12 @@ module.exports = {
             }
           }
         ]
-      }
+      },
+      // autoprefixer postcss-loader
+      // {
+      //   test: /.css$/,
+      //   use
+      // }
     ]
   },
   plugins: [
