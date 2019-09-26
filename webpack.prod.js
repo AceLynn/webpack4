@@ -70,6 +70,7 @@ module.exports = {
     filename: "[name]_[chunkhash:8].js"
   },
   mode: "production",
+  // mode: "none",
   module: {
     rules: [
       {
