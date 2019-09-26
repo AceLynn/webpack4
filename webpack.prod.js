@@ -7,12 +7,64 @@ const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
+// 多页面打包配置
+const glob = require("glob");
+const setMPA = () => {
+  const entry = {};
+  const htmlWebpackPlugins = [];
+
+  const entryFiles = glob.sync(path.join(__dirname, "./src/*/index.js"));
+  Object.keys(entryFiles).map(index => {
+    const entryFile = entryFiles[index];
+
+    // entryfile 'F:/wamp/www/study/webpack/my-project/src/index/index.js'
+    // 正则匹配规则
+    const match = entryFile.match(/src\/(.*)\/index\.js/);
+
+    const pageName = match && match[1];
+
+    entry[pageName] = entryFile;
+    // entry[pageName] = match && match[0];
+    // console.log('match:', match);
+
+    htmlWebpackPlugins.push(
+      new HtmlWebpackPlugin({
+        // 一个页面对应一个hwp 有更简单的写法
+        // hwp提供的html模板
+        template: path.join(__dirname, `src/${pageName}/index.html`),
+        // 打包出来的html文件名称
+        filename: `${pageName}.html`,
+        // html生成后使用哪些chunks
+        chunks: [pageName],
+        // js，css会自动加入到html里面
+        inject: true,
+        minify: {
+          html5: true,
+          collapseWhitespace: true,
+          preserveLineBreaks: false,
+          minifyCSS: true,
+          minifyJS: true,
+          removeComments: false
+        }
+      })
+    );
+  });
+
+  return {
+    entry,
+    htmlWebpackPlugins
+  };
+};
+// setMPA();
+const { entry, htmlWebpackPlugins } = setMPA();
+
+// console.log(entry, htmlWebpackPlugins)
+// console.log(htmlWebpackPlugins)
+
 module.exports = {
-  entry: {
-    index: "./src/index.js",
-    search: "./src/search.js"
-  },
+  entry: entry,
   output: {
+    // __dirname webpack配置文件是所在目录
     path: path.join(__dirname, "dist"),
     filename: "[name]_[chunkhash:8].js"
   },
@@ -84,44 +136,44 @@ module.exports = {
       assetNameRegExp: /\.css$/g,
       cssProcessor: require("cssnano")
     }),
-    new HtmlWebpackPlugin({
-      // 一个页面对应一个hwp 有更简单的写法
-      // hwp提供的html模板
-      template: path.join(__dirname, "src/index.html"),
-      // 打包出来的html文件名称
-      filename: "index.html",
-      // html生成后使用哪些chunks
-      chunks: ["index"],
-      // js，css会自动加入到html里面
-      inject: true,
-      minify: {
-        html5: true,
-        collapseWhitespace: true,
-        preserveLineBreaks: false,
-        minifyCSS: true,
-        minifyJS: true,
-        removeComments: false
-      }
-    }),
-    new HtmlWebpackPlugin({
-      // 一个页面对应一个hwp
-      // hwp提供的html模板
-      template: path.join(__dirname, "src/search.html"),
-      // 打包出来的html文件名称
-      filename: "search.html",
-      // html生成后使用哪些chunks
-      chunks: ["search"],
-      // js，css会自动加入到html里面
-      inject: true,
-      minify: {
-        html5: true,
-        collapseWhitespace: true,
-        preserveLineBreaks: false,
-        minifyCSS: true,
-        minifyJS: true,
-        removeComments: false
-      }
-    }),
+    // new HtmlWebpackPlugin({
+    //   // 一个页面对应一个hwp 有更简单的写法
+    //   // hwp提供的html模板
+    //   template: path.join(__dirname, "src/index.html"),
+    //   // 打包出来的html文件名称
+    //   filename: "index.html",
+    //   // html生成后使用哪些chunks
+    //   chunks: ["index"],
+    //   // js，css会自动加入到html里面
+    //   inject: true,
+    //   minify: {
+    //     html5: true,
+    //     collapseWhitespace: true,
+    //     preserveLineBreaks: false,
+    //     minifyCSS: true,
+    //     minifyJS: true,
+    //     removeComments: false
+    //   }
+    // }),
+    // new HtmlWebpackPlugin({
+    //   // 一个页面对应一个hwp
+    //   // hwp提供的html模板
+    //   template: path.join(__dirname, "src/search.html"),
+    //   // 打包出来的html文件名称
+    //   filename: "search.html",
+    //   // html生成后使用哪些chunks
+    //   chunks: ["search"],
+    //   // js，css会自动加入到html里面
+    //   inject: true,
+    //   minify: {
+    //     html5: true,
+    //     collapseWhitespace: true,
+    //     preserveLineBreaks: false,
+    //     minifyCSS: true,
+    //     minifyJS: true,
+    //     removeComments: false
+    //   }
+    // }),
     new CleanWebpackPlugin()
-  ]
+  ].concat(htmlWebpackPlugins)
 };
