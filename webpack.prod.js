@@ -6,6 +6,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackExternalsPlugin = require("html-webpack-externals-plugin");
 
 // 多页面打包配置
 const glob = require("glob");
@@ -35,7 +36,7 @@ const setMPA = () => {
         // 打包出来的html文件名称
         filename: `${pageName}.html`,
         // html生成后使用哪些chunks
-        chunks: [pageName],
+        chunks: ["vendors", pageName],
         // js，css会自动加入到html里面
         inject: true,
         minify: {
@@ -175,6 +176,41 @@ module.exports = {
     //   }
     // }),
     new CleanWebpackPlugin()
+    // new HtmlWebpackExternalsPlugin({
+    //   externals: [
+    //     {
+    //       module: 'react',
+    //       entry: 'https://11.url.cn/now/lib/16.2.0/react.min.js',
+    //       global: 'React'
+    //     },
+    //     {
+    //       module: 'react-dom',
+    //       entry: 'https://11.url.cn/now/lib/16.2.0/react-dom.min.js',
+    //       global: 'ReactDOM'
+    //     }
+    //   ]
+    // })
   ].concat(htmlWebpackPlugins),
-  // devtool: 'inline-source-map'
+  // devtool: 'inline-source-map',
+  optimization: {
+    // splitChunks: {
+    //   cacheGroups: {
+    //     commons: {
+    //       test: /(react|react-dom)/,
+    //       name: "vendors",
+    //       chunks: "all"
+    //     }
+    //   }
+    // }
+    splitChunks: {
+      minSize: 10000,
+      cacheGroups: {
+        commons: {
+          name: "common",
+          chunks: "all",
+          minChunks: 2
+        }
+      }
+    }
+  }
 };
