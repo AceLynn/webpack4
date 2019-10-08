@@ -128,6 +128,7 @@ module.exports = {
     ]
   },
   plugins: [
+    // new webpack.optimize.ModuleConcatenationPlugin(),
     // css抽取插件
     new MiniCssExtractPlugin({
       filename: "[name]_[contentHash:8].css"
