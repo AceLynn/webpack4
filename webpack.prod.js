@@ -7,6 +7,7 @@ const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const HtmlWebpackExternalsPlugin = require("html-webpack-externals-plugin");
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 // 多页面打包配置
 const glob = require("glob");
@@ -142,6 +143,7 @@ module.exports = {
       assetNameRegExp: /\.css$/g,
       cssProcessor: require("cssnano")
     }),
+    new FriendlyErrorsWebpackPlugin(),
     // new HtmlWebpackPlugin({
     //   // 一个页面对应一个hwp 有更简单的写法
     //   // hwp提供的html模板
@@ -196,7 +198,7 @@ module.exports = {
     //   ]
     // })
   ].concat(htmlWebpackPlugins),
-  // stats: "errors-only",
+  stats: "errors-only",
   // devtool: 'inline-source-map',
   optimization: {
     // splitChunks: {
