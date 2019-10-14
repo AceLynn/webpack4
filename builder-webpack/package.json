@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover ./node_modules/.bin/_mocha",
+    "test": "nyc ./node_modules/.bin/_mocha",
+    "coverage": "nyc npm run test",
     "eslint": "eslint ./lib --fix"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
     "glob-all": "^3.1.0",
     "istanbul": "^0.4.5",
     "mocha": "^6.2.1",
+    "nyc": "^14.1.1",
     "rimraf": "^2.7.1"
   },
   "dependencies": {
