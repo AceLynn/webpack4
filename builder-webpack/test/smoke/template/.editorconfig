@@ -1,0 +1,2 @@
+# 结尾换行符，可选"lf"、"cr"、"crlf"
+end_of_line = lf
