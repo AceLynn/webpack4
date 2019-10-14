@@ -143,7 +143,17 @@ module.exports = {
       assetNameRegExp: /\.css$/g,
       cssProcessor: require("cssnano")
     }),
+    // 优化构建提示文本
     new FriendlyErrorsWebpackPlugin(),
+    // 主动捕获构建错误
+    function() {
+      this.hooks.done.tap('done', (stats) => {
+        if(stats.compilation.errors && stats.compilation.errors.length && process.argv.indexOf('--watch') == -1) {
+          console.log('build error');
+          process.exit(1);
+        }
+      })
+    },
     // new HtmlWebpackPlugin({
     //   // 一个页面对应一个hwp 有更简单的写法
     //   // hwp提供的html模板
