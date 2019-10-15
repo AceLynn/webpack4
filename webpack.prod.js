@@ -5,9 +5,17 @@ const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackExternalsPlugin = require("html-webpack-externals-plugin");
-const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
+// 打包速度分析插件
+const SpeedMeasureWebpackPlugin = require("speed-measure-webpack-plugin");
+// 体积大小分析插件
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+// 多进程压缩打包
+const TerserWebpackPlugin = require("terser-webpack-plugin");
+
+const smp = new SpeedMeasureWebpackPlugin();
 
 // 多页面打包配置
 const glob = require("glob");
@@ -63,7 +71,8 @@ const { entry, htmlWebpackPlugins } = setMPA();
 // console.log(entry, htmlWebpackPlugins)
 // console.log(htmlWebpackPlugins)
 
-module.exports = {
+// 打包速度分析插件
+module.exports = smp.wrap({
   entry: entry,
   output: {
     // __dirname webpack配置文件是所在目录
@@ -77,7 +86,13 @@ module.exports = {
       {
         test: /\.js$/,
         use: [
-          "babel-loader",
+          {
+            loader: "thread-loader",
+            options: {
+              workers: 3
+            }
+          },
+          "babel-loader"
           //  "eslint-loader"
         ]
       },
@@ -147,12 +162,16 @@ module.exports = {
     new FriendlyErrorsWebpackPlugin(),
     // 主动捕获构建错误
     function() {
-      this.hooks.done.tap('done', (stats) => {
-        if(stats.compilation.errors && stats.compilation.errors.length && process.argv.indexOf('--watch') == -1) {
-          console.log('build error');
+      this.hooks.done.tap("done", stats => {
+        if (
+          stats.compilation.errors &&
+          stats.compilation.errors.length &&
+          process.argv.indexOf("--watch") == -1
+        ) {
+          console.log("build error");
           process.exit(1);
         }
-      })
+      });
     },
     // new HtmlWebpackPlugin({
     //   // 一个页面对应一个hwp 有更简单的写法
@@ -192,7 +211,7 @@ module.exports = {
     //     removeComments: false
     //   }
     // }),
-    new CleanWebpackPlugin()
+    new CleanWebpackPlugin(),
     // new HtmlWebpackExternalsPlugin({
     //   externals: [
     //     {
@@ -207,6 +226,7 @@ module.exports = {
     //     }
     //   ]
     // })
+    new BundleAnalyzerPlugin()
   ].concat(htmlWebpackPlugins),
   stats: "errors-only",
   // devtool: 'inline-source-map',
@@ -220,6 +240,12 @@ module.exports = {
     //     }
     //   }
     // }
+    // 并行压缩
+    minimizer: [
+      new TerserWebpackPlugin({
+        parallel: true
+      })
+    ],
     splitChunks: {
       minSize: 10000,
       cacheGroups: {
@@ -231,4 +257,4 @@ module.exports = {
       }
     }
   }
-};
+});

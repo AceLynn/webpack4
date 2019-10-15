@@ -1,10 +1,13 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./search.scss";
-import logo from "./images/qcode.png";
-// import "../../common/index";
-import { a } from "./tree-shaking";
-// import 'babel-polyfill';
+"use strict";
+
+// import React from "react";
+// import "./search.scss";
+// import logo from "./images/qcode.png";
+
+const React = require("react");
+// const largeNumber = require("large-number");
+const logo = require("./images/qcode.png");
+require("./search.scss");
 
 class Search extends React.Component {
   constructor() {
@@ -24,20 +27,16 @@ class Search extends React.Component {
   }
 
   render() {
-    const funcA = a();
     const { Text } = this.state;
 
     return (
       <div class="searchText">
-        {
-          Text ? <Text /> : null
-        }
-        {funcA}Search <span class="text">React</span> Demo2222{" "}
+        {Text ? <Text /> : null}
+        Search <span class="text">React</span> Demo2222{" "}
         <img src={logo} onClick={this.loadComponent.bind(this)} />
       </div>
     );
   }
 }
-import { format } from "path";
 
-ReactDOM.render(<Search />, document.getElementById("root"));
+module.exports = <Search />;
