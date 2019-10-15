@@ -8,14 +8,15 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackExternalsPlugin = require("html-webpack-externals-plugin");
 const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
+
 // 打包速度分析插件
 const SpeedMeasureWebpackPlugin = require("speed-measure-webpack-plugin");
+const smp = new SpeedMeasureWebpackPlugin();
+
 // 体积大小分析插件
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 // 多进程压缩打包
 const TerserWebpackPlugin = require("terser-webpack-plugin");
-
-const smp = new SpeedMeasureWebpackPlugin();
 
 // 多页面打包配置
 const glob = require("glob");
@@ -148,6 +149,10 @@ module.exports = smp.wrap({
   },
   plugins: [
     // new webpack.optimize.ModuleConcatenationPlugin(),
+    // 预编译资源打包
+    new webpack.DllReferencePlugin({
+      manifest: require("./build/library/library.json")
+    }),
     // css抽取插件
     new MiniCssExtractPlugin({
       filename: "[name]_[contentHash:8].css"
@@ -226,7 +231,9 @@ module.exports = smp.wrap({
     //     }
     //   ]
     // })
-    new BundleAnalyzerPlugin()
+    
+    // 打包分析图插件
+    // new BundleAnalyzerPlugin()
   ].concat(htmlWebpackPlugins),
   stats: "errors-only",
   // devtool: 'inline-source-map',
