@@ -18,6 +18,8 @@ const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 // 多进程压缩打包
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 
+const HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
+
 // 多页面打包配置
 const glob = require("glob");
 const setMPA = () => {
@@ -93,7 +95,7 @@ module.exports = smp.wrap({
               workers: 3
             }
           },
-          "babel-loader"
+          "babel-loader?cacheDirectory=true"
           //  "eslint-loader"
         ]
       },
@@ -216,7 +218,12 @@ module.exports = smp.wrap({
     //     removeComments: false
     //   }
     // }),
-    new CleanWebpackPlugin(),
+
+    // 二次缓存-模块
+    // 可极大提高打包速度
+    new HardSourceWebpackPlugin(),
+
+    new CleanWebpackPlugin()
     // new HtmlWebpackExternalsPlugin({
     //   externals: [
     //     {
@@ -231,7 +238,7 @@ module.exports = smp.wrap({
     //     }
     //   ]
     // })
-    
+
     // 打包分析图插件
     // new BundleAnalyzerPlugin()
   ].concat(htmlWebpackPlugins),
@@ -250,7 +257,9 @@ module.exports = smp.wrap({
     // 并行压缩
     minimizer: [
       new TerserWebpackPlugin({
-        parallel: true
+        parallel: true,
+        // 并行压缩的二次打包缓存
+        cache: true
       })
     ],
     splitChunks: {
